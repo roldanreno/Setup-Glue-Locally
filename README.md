@@ -9,4 +9,37 @@ AWS Glue consists of a Data Catalog which is a central metadata repository; an E
 
 Learn more here [AWS Glue Developer Guide](https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html)
 
+# How do I develop on AWS Glue
+
+When you develop and test your AWS Glue job scripts, there are multiple available options:
+
+AWS Glue Studio console
+
+- Visual editor
+- Script editor
+- AWS Glue Studio notebook
+
+Interactive sessions
+
+- Jupyter notebook
+
+Docker image
+
+- Local development
+- Remote development
+
+AWS Glue Studio ETL library
+- Local development
+
+You can choose any of the above options based on your requirements.
+
+If you prefer no code or less code experience, the AWS Glue Studio visual editor is a good choice.
+
+If you prefer an interactive notebook experience, AWS Glue Studio notebook is a good choice. For more information, see Using Notebooks with AWS Glue Studio and AWS Glue. If you want to use your own local environment, interactive sessions is a good choice. For more information, see Using Interactive Sessions with AWS Glue.
+
+If you prefer local/remote development experience, the Docker image is a good choice. This helps you to develop and test Glue job script anywhere you prefer without incurring AWS Glue cost.
+
+If you prefer local development without Docker, installing the AWS Glue ETL library directory locally is a good choice.
+
 # How to Start?
+
