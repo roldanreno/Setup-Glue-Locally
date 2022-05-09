@@ -43,3 +43,21 @@ If you prefer local development without Docker, installing the AWS Glue ETL libr
 
 # How to Start?
 
+Make sure that Docker is installed and the Docker daemon is running. For installation instructions, see the Docker documentation for Mac, Windows, or Linux. The machine running the Docker hosts the AWS Glue container. Also make sure that you have at least 7 GB of disk space for the image on the host running the Docker.
+
+For more information about restrictions when developing AWS Glue code locally, see Local Development Restrictions.
+
+There are the following Docker images available for AWS Glue on Docker Hub.
+
+- For AWS Glue version 3.0: amazon/aws-glue-libs:glue_libs_3.0.0_image_01
+- For AWS Glue version 2.0: amazon/aws-glue-libs:glue_libs_2.0.0_image_01
+
+These images are for x86_64.
+
+# Container Setup
+
+1. Pull the image from Docker Hub
+
+```bash
+docker pull amazon/aws-glue-libs:glue_libs_3.0.0_image_01
+```
