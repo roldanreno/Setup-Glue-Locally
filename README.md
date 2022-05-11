@@ -83,3 +83,63 @@ The code includes the following information:
 amazon/aws-glue-libs:glue_libs_1.0.0_image_01 – The name of the image that we pulled in the previous step.
 
 <command_to_start_notebook_server> – We run /home/zeppelin/bin/zeppelin.sh for a Zeppelin notebook and /home/jupyter/jupyter_start.sh for a Jupyter notebook. If you want to run your code against the CLI interpreter, you don’t need a notebook server and can leave this argument blank.
+
+Run Spark in your container:
+
+```console
+docker run -itd -p 8888:8888 -p 4040:4040 -v ~/.aws:/root/.aws:ro --name glue_jupyter amazon/aws-glue-libs:glue_libs_1.0.0_image_01 /home/jupyter/jupyter_start.sh
+```
+
+3. Run the following script (/scripts/src/sample.py):
+
+```python
+from pyspark import SparkContext
+from operator import add
+ 
+data = sc.parallelize(list("Hello World"))
+counts = data.map(lambda x: 
+	(x, 1)).reduceByKey(add).sortBy(lambda x: x[1],
+	 ascending=False).collect()
+
+print("Hello World")
+for (word, count) in counts:
+    print("{}: {}".format(word, count))
+```
+
+The result should look like this:
+
+```console
+Hello World
+l: 3
+o: 2
+r: 1
+H: 1
+e: 1
+W: 1
+d: 1
+ : 1
+```
+
+4. To run a script directly in your container use the following command:
+
+```console
+docker run -it -v ~/.aws:/home/glue_user/.aws -v $WORKSPACE_LOCATION:/home/glue_user/workspace/ -e AWS_PROFILE=$PROFILE_NAME -e DISABLE_SSL=true --rm -p 4040:4040 -p 18080:18080 --name glue_spark_submit amazon/aws-glue-libs:glue_libs_3.0.0_image_01 spark-submit /home/glue_user/workspace/src/$SCRIPT_FILE_NAME
+````
+
+The result should look like:
+
+```console
+--------------------------------------------- Script Start ---------------------------------------------
+Hello World
+l: 3
+o: 2
+r: 1
+H: 1
+e: 1
+W: 1
+d: 1
+ : 1
+--------------------------------------------- Script End ---------------------------------------------
+```
+
+5. 
