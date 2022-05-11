@@ -58,7 +58,7 @@ These images are for x86_64.
 
 1. Pull the image from Docker Hub
 
-```python
+```docker
 docker pull amazon/aws-glue-libs:glue_libs_3.0.0_image_01
 ```
 ## Run your container
@@ -124,7 +124,7 @@ d: 1
 
 4. To run a script directly in your container use the following command:
 
-```console
+```docker
 docker run -it -v ~/.aws:/home/glue_user/.aws -v $WORKSPACE_LOCATION:/home/glue_user/workspace/ -e AWS_PROFILE=$PROFILE_NAME -e DISABLE_SSL=true --rm -p 4040:4040 -p 18080:18080 --name glue_spark_submit amazon/aws-glue-libs:glue_libs_3.0.0_image_01 spark-submit /home/glue_user/workspace/src/$SCRIPT_FILE_NAME
 ````
 
@@ -140,7 +140,6 @@ H: 1
 e: 1
 W: 1
 d: 1
- : 1
 --------------------------------------------- Script End ------------------------------------------
 ```
 
@@ -186,4 +185,11 @@ If you have a local directory that holds your notebooks, you can mount it to /ho
 
 ```docker
 docker run -itd -p 8888:8888 -p 4040:4040 -v ~/.aws:/root/.aws:ro -v C:\Users\admin\Documents\notebooks:/home/glue_user/jupyter/jupyter_default_dir --name glue_jupyter amazon/aws-glue-libs:glue_libs_3.0.0_image_01 /home/glue_user/jupyter/jupyter_start.sh
+```
+
+Here's a script to test:
+
+```python
+
+
 ```
