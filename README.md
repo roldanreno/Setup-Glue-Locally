@@ -58,7 +58,7 @@ These images are for x86_64.
 
 1. Pull the image from Docker Hub
 
-```docker
+```python
 docker pull amazon/aws-glue-libs:glue_libs_3.0.0_image_01
 ```
 ## Run your container
