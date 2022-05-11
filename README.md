@@ -187,9 +187,4 @@ If you have a local directory that holds your notebooks, you can mount it to /ho
 docker run -itd -p 8888:8888 -p 4040:4040 -v ~/.aws:/root/.aws:ro -v C:\Users\admin\Documents\notebooks:/home/glue_user/jupyter/jupyter_default_dir --name glue_jupyter amazon/aws-glue-libs:glue_libs_3.0.0_image_01 /home/glue_user/jupyter/jupyter_start.sh
 ```
 
-Here's a script to test:
-
-```python
-
-
-```
+For more details you can check oficial AWS Documentation [here](https://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-etl-libraries.html) 
