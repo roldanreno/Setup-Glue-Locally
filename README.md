@@ -54,20 +54,21 @@ There are the following Docker images available for AWS Glue on Docker Hub.
 
 These images are for x86_64.
 
-# Container Setup
+## Container Setup
 
 1. Pull the image from Docker Hub
 
-```console
+```docker
 docker pull amazon/aws-glue-libs:glue_libs_3.0.0_image_01
 ```
+## Run your container
 
 2. Run the container
 
 The general format of the run command is:
 
-```console
-docker run -itd -p <port_on_host>:<port_on_container_either_8888_or_8080> -p 4040:4040 <credential_setup_to_access_AWS_resources> --name <container_name> amazon/aws-glue-libs:glue_libs_1.0.0_image_01 <command_to_start_notebook_server>
+```docker
+docker run -itd -p <port_on_host>:<port_on_container_either_8888_or_8080> -p 4040:4040 <credential_setup_to_access_AWS_resources> --name <container_name> amazon/aws-glue-libs:glue_libs_3.0.0_image_01 <command_to_start_notebook_server>
 ```
 
 The code includes the following information:
@@ -86,8 +87,8 @@ amazon/aws-glue-libs:glue_libs_1.0.0_image_01 – The name of the image that we 
 
 Run Spark in your container:
 
-```console
-docker run -itd -p 8888:8888 -p 4040:4040 -v ~/.aws:/root/.aws:ro --name glue_jupyter amazon/aws-glue-libs:glue_libs_1.0.0_image_01 /home/jupyter/jupyter_start.sh
+```docker
+$ docker run -it -v ~/.aws:/home/glue_user/.aws -e AWS_PROFILE=$PROFILE_NAME -e DISABLE_SSL=true --rm -p 4040:4040 -p 18080:18080 --name glue_pyspark amazon/aws-glue-libs:glue_libs_3.0.0_image_01 pyspark
 ```
 
 3. Run the following script (/scripts/src/sample.py):
@@ -110,6 +111,8 @@ The result should look like this:
 
 ```console
 Hello World
+
+
 l: 3
 o: 2
 r: 1
@@ -117,7 +120,6 @@ H: 1
 e: 1
 W: 1
 d: 1
- : 1
 ```
 
 4. To run a script directly in your container use the following command:
@@ -129,7 +131,7 @@ docker run -it -v ~/.aws:/home/glue_user/.aws -v $WORKSPACE_LOCATION:/home/glue_
 The result should look like:
 
 ```console
---------------------------------------------- Script Start ---------------------------------------------
+--------------------------------------------- Script Start -----------------------------------------
 Hello World
 l: 3
 o: 2
@@ -139,7 +141,49 @@ e: 1
 W: 1
 d: 1
  : 1
---------------------------------------------- Script End ---------------------------------------------
+--------------------------------------------- Script End ------------------------------------------
 ```
 
-5. 
+5. Run the following code to starts a Jupyter notebook: 
+
+- Read-only credentials from a Mac or Linux host:
+
+```docker
+docker run -itd -p 8888:8888 -p 4040:4040 -v ~/.aws:/root/.aws:ro --name glue_jupyter amazon/aws-glue-libs:glue_libs_3.0.0_image_01 /home/glue_user/jupyter/jupyter_start.sh
+```
+
+- Read-write credentials from a Windows host:
+
+```docker
+docker run -itd -p 8888:8888 -p 4040:4040 -v %UserProfile%\.aws:/root/.aws:rw --name glue_jupyter amazon/aws-glue-libs:glue_libs_3.0.0_image_01 /home/glue_user/jupyter/jupyter_start.sh
+```
+
+You can now run the following command to make sure that the container is running:
+
+```docker
+docker ps
+```
+
+The following example code is the docker run command without the notebook server startup:
+
+```docker
+docker run -itd -p 8888:8888 -p 4040:4040 -v ~/.aws:/root/.aws:ro --name glue_jupyter amazon/aws-glue-libs:glue_libs_1.0.0_image_01
+```
+
+Log into your container
+
+```docker
+docker exec -it glue_jupyter bash
+```
+
+6. Open your notebook
+
+If your client and host are the same machine, enter the following URL for Jupyter: https://127.0.0.1:8888/lab.
+
+You can write PySpark code in the notebook as shown here. You can also use SQL magic (%%sql) to directly write SQL against the tables in the AWS Glue Data Catalog. If your catalog table is on top of JSON data, you have to place json-serde.jar in the /home/spark-2.4.3-bin-spark-2.4.3-bin-hadoop2.8/jars directory of the container and restart the kernel in your Jupyter notebook. You can place the jar in this directory by first running the bash shell on the container using the following command:
+
+If you have a local directory that holds your notebooks, you can mount it to /home/jupyter/jupyter_default_dir using the -v option. These notebooks are available to you when you open the Jupyter notebook URL. For example, see the following code:
+
+```docker
+docker run -itd -p 8888:8888 -p 4040:4040 -v ~/.aws:/root/.aws:ro -v C:\Users\admin\Documents\notebooks:/home/glue_user/jupyter/jupyter_default_dir --name glue_jupyter amazon/aws-glue-libs:glue_libs_3.0.0_image_01 /home/glue_user/jupyter/jupyter_start.sh
+```
