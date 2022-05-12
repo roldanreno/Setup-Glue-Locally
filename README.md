@@ -61,6 +61,21 @@ These images are for x86_64.
 ```docker
 docker pull amazon/aws-glue-libs:glue_libs_3.0.0_image_01
 ```
+
+2. Save environment variables (You only have to add your profile name if you want to enable AWS API calls from the container)
+
+```console
+PROFILE_NAME="profile_name"
+```
+
+```console
+WORKSPACE_LOCATION=scripts
+SCRIPT_FILE_NAME=sample.py
+mkdir -p ${WORKSPACE_LOCATION}/src
+````
+
+You will find "sample.py" file in the scripts src folder of this repo ("/scripts/src/sample.py")
+
 ## Run your container
 
 2. Run the container
@@ -73,22 +88,22 @@ docker run -itd -p <port_on_host>:<port_on_container_either_8888_or_8080> -p 404
 
 The code includes the following information:
 
-<port_on_host> – The local port of your host that is mapped to the port of the container. For our use case, the container port is either 8888 (for a Jupyter notebook) or 8080 (for a Zeppelin notebook). To keep things simple, we use the same port number as the notebook server ports on the container in the following examples.
+**<port_on_host>** – The local port of your host that is mapped to the port of the container. For our use case, the container port is either 8888 (for a Jupyter notebook) or 8080 (for a Zeppelin notebook). To keep things simple, we use the same port number as the notebook server ports on the container in the following examples.
 
-<port_on_container_either_8888_or_8080> – The port of the notebook server on the container. The default port of Jupyter is 8888; the default port of Zeppelin is 8080.
+**<port_on_container_either_8888_or_8080>** – The port of the notebook server on the container. The default port of Jupyter is 8888; the default port of Zeppelin is 8080.
 4040:4040 – This is required for SparkUI. 4040 is the default port for SparkUI. For more information, see Web Interfaces.
 
-<credential_setup_to_access_AWS_resources> – In this section, we go with the typical case of mounting the host’s directory, containing the credentials. We assume that your host has the credentials configured using aws configure. The flow chart in the Appendix section explains various ways to set the credentials if the assumption doesn’t hold for your environment.
+**<credential_setup_to_access_AWS_resources>** – In this section, we go with the typical case of mounting the host’s directory, containing the credentials. We assume that your host has the credentials configured using aws configure. The flow chart in the Appendix section explains various ways to set the credentials if the assumption doesn’t hold for your environment.
 
-<container_name> – The name of the container. You can use any text here.
+**<container_name>** – The name of the container. You can use any text here.
 amazon/aws-glue-libs:glue_libs_1.0.0_image_01 – The name of the image that we pulled in the previous step.
 
-<command_to_start_notebook_server> – We run /home/zeppelin/bin/zeppelin.sh for a Zeppelin notebook and /home/jupyter/jupyter_start.sh for a Jupyter notebook. If you want to run your code against the CLI interpreter, you don’t need a notebook server and can leave this argument blank.
+**<command_to_start_notebook_server>** – We run /home/zeppelin/bin/zeppelin.sh for a Zeppelin notebook and /home/jupyter/jupyter_start.sh for a Jupyter notebook. If you want to run your code against the CLI interpreter, you don’t need a notebook server and can leave this argument blank.
 
 Run Spark in your container:
 
 ```docker
-$ docker run -it -v ~/.aws:/home/glue_user/.aws -e AWS_PROFILE=$PROFILE_NAME -e DISABLE_SSL=true --rm -p 4040:4040 -p 18080:18080 --name glue_pyspark amazon/aws-glue-libs:glue_libs_3.0.0_image_01 pyspark
+docker run -it -p 4040:4040 -p 18080:18080 --name glue_pyspark amazon/aws-glue-libs:glue_libs_3.0.0_image_01 pyspark
 ```
 
 3. Run the following script (/scripts/src/sample.py):
@@ -125,7 +140,7 @@ d: 1
 4. To run a script directly in your container use the following command:
 
 ```docker
-docker run -it -v ~/.aws:/home/glue_user/.aws -v $WORKSPACE_LOCATION:/home/glue_user/workspace/ -e AWS_PROFILE=$PROFILE_NAME -e DISABLE_SSL=true --rm -p 4040:4040 -p 18080:18080 --name glue_spark_submit amazon/aws-glue-libs:glue_libs_3.0.0_image_01 spark-submit /home/glue_user/workspace/src/$SCRIPT_FILE_NAME
+docker run -it -v $WORKSPACE_LOCATION:/home/glue_user/workspace/ -e AWS_PROFILE=$PROFILE_NAME -e DISABLE_SSL=true --rm -p 4040:4040 -p 18080:18080 --name glue_spark_submit amazon/aws-glue-libs:glue_libs_3.0.0_image_01 spark-submit /home/glue_user/workspace/src/$SCRIPT_FILE_NAME
 ````
 
 The result should look like:
@@ -145,16 +160,8 @@ d: 1
 
 5. Run the following code to starts a Jupyter notebook: 
 
-- Read-only credentials from a Mac or Linux host:
-
 ```docker
-docker run -itd -p 8888:8888 -p 4040:4040 -v ~/.aws:/root/.aws:ro --name glue_jupyter amazon/aws-glue-libs:glue_libs_3.0.0_image_01 /home/glue_user/jupyter/jupyter_start.sh
-```
-
-- Read-write credentials from a Windows host:
-
-```docker
-docker run -itd -p 8888:8888 -p 4040:4040 -v %UserProfile%\.aws:/root/.aws:rw --name glue_jupyter amazon/aws-glue-libs:glue_libs_3.0.0_image_01 /home/glue_user/jupyter/jupyter_start.sh
+docker run -itd -p 8888:8888 -p 4040:4040 --name glue_jupyter amazon/aws-glue-libs:glue_libs_3.0.0_image_01 /home/glue_user/jupyter/jupyter_start.sh
 ```
 
 You can now run the following command to make sure that the container is running:
@@ -166,7 +173,7 @@ docker ps
 The following example code is the docker run command without the notebook server startup:
 
 ```docker
-docker run -itd -p 8888:8888 -p 4040:4040 -v ~/.aws:/root/.aws:ro --name glue_jupyter amazon/aws-glue-libs:glue_libs_1.0.0_image_01
+docker run -itd -p 8888:8888 -p 4040:4040 --name glue_jupyter amazon/aws-glue-libs:glue_libs_3.0.0_image_01
 ```
 
 Log into your container
@@ -184,7 +191,27 @@ You can write PySpark code in the notebook as shown here. You can also use SQL m
 If you have a local directory that holds your notebooks, you can mount it to /home/jupyter/jupyter_default_dir using the -v option. These notebooks are available to you when you open the Jupyter notebook URL. For example, see the following code:
 
 ```docker
-docker run -itd -p 8888:8888 -p 4040:4040 -v ~/.aws:/root/.aws:ro -v C:\Users\admin\Documents\notebooks:/home/glue_user/jupyter/jupyter_default_dir --name glue_jupyter amazon/aws-glue-libs:glue_libs_3.0.0_image_01 /home/glue_user/jupyter/jupyter_start.sh
+docker run -itd -p 8888:8888 -p 4040:4040 -v C:\Users\admin\Documents\notebooks:/home/glue_user/jupyter/jupyter_default_dir --name glue_jupyter amazon/aws-glue-libs:glue_libs_3.0.0_image_01 /home/glue_user/jupyter/jupyter_start.sh
+```
+
+7. Create a Python 3 notebook and run the following code:
+
+```python
+from pyspark import SparkContext
+from awsglue.context import GlueContext
+from operator import add
+
+sc = SparkContext.getOrCreate()
+glueContext = GlueContext(sc)
+spark = glueContext.spark_session 
+data = sc.parallelize(list("Hello World"))
+counts = data.map(lambda x: 
+	(x, 1)).reduceByKey(add).sortBy(lambda x: x[1],
+	 ascending=False).collect()
+
+print("Hello World")
+for (word, count) in counts:
+    print("{}: {}".format(word, count))
 ```
 
 For more details you can check oficial AWS Documentation [here](https://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-etl-libraries.html) 
