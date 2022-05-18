@@ -69,7 +69,7 @@ PROFILE_NAME="profile_name"
 ```
 
 ```console
-WORKSPACE_LOCATION=scripts
+WORKSPACE_LOCATION=/Users/reroldan/Documents/repos/Setup-Glue-Locally/scripts
 SCRIPT_FILE_NAME=sample.py
 mkdir -p ${WORKSPACE_LOCATION}/src
 ````
