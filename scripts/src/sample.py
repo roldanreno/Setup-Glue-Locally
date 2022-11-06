@@ -16,8 +16,10 @@ counts = data.map(lambda x:
 	(x, 1)).reduceByKey(add).sortBy(lambda x: x[1],
 	 ascending=False).collect()
 
+palabra = "Hello World"
 print("--------------------------------------------- Script Start ---------------------------------------------")
-print("Hello World")
+print(palabra)
+print(palabra[::-1])
 
 for (word, count) in counts:
     print("{}: {}".format(word, count))
